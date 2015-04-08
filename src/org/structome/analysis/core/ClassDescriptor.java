@@ -24,6 +24,7 @@ public class ClassDescriptor implements Indexable {
 	private Map<String, VarDescriptor> members = new HashMap<String, VarDescriptor>();
 	private Map<String, MethodDescriptor> methods = new HashMap<String, MethodDescriptor>();
 	private Map<String, ClassMetadata> metadataRegistry = new HashMap<String, ClassMetadata>();
+	private Map<String, String> imports = new HashMap<String, String>();
 	private ClassDescriptor superClass;
 	private boolean resolved;
 
@@ -54,8 +55,8 @@ public class ClassDescriptor implements Indexable {
 		methods.put(_methodDesc.getName(), _methodDesc);
 	}
 
-	public void addMetadata(ClassMetadata _classMetadata) {
-		metadataRegistry.put(_classMetadata.getName(), _classMetadata);
+	public void addMetadata(String _key, ClassMetadata _classMetadata) {
+		metadataRegistry.put(_key, _classMetadata);
 	}
 
 	public ClassMetadata getMetadata(String _name) {
@@ -98,5 +99,17 @@ public class ClassDescriptor implements Indexable {
 
 	public void resolve() {
 		resolved = true;
+	}
+
+	public Collection<String> getImports() {
+		return imports.values();
+	}
+
+	public void addImport(String _name, String _referencedType) {
+		imports.put(_name, _referencedType);
+	}
+
+	public String getImport(String _name) {
+		return imports.get(_name);
 	}
 }

@@ -67,6 +67,12 @@ public class DataExtractor {
 				_ps.println("SUPER:" + _superClassDesc.getName());
 			}
 
+			if (_classDesc.getImports() != null) {
+				for (String _import : _classDesc.getImports()) {
+					_ps.println("IMPORT:" + _import);
+				}
+			}
+
 			for (VarDescriptor _varDesc : _classDesc.getAllMembers()) {
 				_ps.println("FIELD_NAME:" + _varDesc.getName());
 				_ps.println("FIELD_TYPE:" + _varDesc.getType());

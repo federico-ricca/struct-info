@@ -16,9 +16,7 @@
 package org.structome.analysis.core;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.codehaus.groovy.ast.ASTNode;
 import org.codehaus.groovy.ast.AnnotatedNode;
@@ -44,7 +42,6 @@ public class GroovyClassCodeVisitor extends ClassCodeVisitorSupport {
 	private StructureDatabase<ClassDescriptor> database;
 	private ClassDescriptor lastProcessedClass;
 	private MethodDescriptor lastProcessedMethod;
-	private Map<String, String> imports = new HashMap<String, String>();
 
 	public GroovyClassCodeVisitor(SourceUnit _source, StructureDatabase<ClassDescriptor> _db) {
 		source = _source;
@@ -56,6 +53,18 @@ public class GroovyClassCodeVisitor extends ClassCodeVisitorSupport {
 		return source;
 	}
 
+	public ClassDescriptor getCurrentClass() {
+		return lastProcessedClass;
+	}
+	
+	public MethodDescriptor getCurrentMethod() {
+		return lastProcessedMethod;
+	}
+	
+	public StructureDatabase<ClassDescriptor> getDatabase() {
+		return database;
+	}
+	
 	@Override
 	public void visitClass(ClassNode _node) {
 		ClassDescriptor _classDesc = new ClassDescriptor();
@@ -71,7 +80,7 @@ public class GroovyClassCodeVisitor extends ClassCodeVisitorSupport {
 			String _parentClassname = _superClassNode.getNameWithoutPackage();
 
 			if (_superClassNode != null) {
-				String _referencedType = imports.get(_parentClassname);
+				String _referencedType = lastProcessedClass.getImport(_parentClassname);
 
 				if (_referencedType == null) {
 					Collection<ClassDescriptor> _references = database.find(".*\\." + _parentClassname);
@@ -138,6 +147,8 @@ public class GroovyClassCodeVisitor extends ClassCodeVisitorSupport {
 
 	@Override
 	public void visitVariableExpression(VariableExpression _variableExpression) {
+		super.visitVariableExpression(_variableExpression);
+
 		if (lastProcessedMethod != null) {
 			String _varName = _variableExpression.getName();
 
@@ -157,11 +168,12 @@ public class GroovyClassCodeVisitor extends ClassCodeVisitorSupport {
 				lastProcessedMethod.addVarDescriptor(_varDesc);
 			}
 		}
-		super.visitVariableExpression(_variableExpression);
 	}
 
 	@Override
 	public void visitProperty(PropertyNode _node) {
+		super.visitProperty(_node);
+
 		if (_node.getField().getInitialExpression() instanceof ClosureExpression) {
 			ClosureExpression _closure = (ClosureExpression) _node.getField().getInitialExpression();
 
@@ -186,12 +198,12 @@ public class GroovyClassCodeVisitor extends ClassCodeVisitorSupport {
 			_fieldDecl.setType(_node.getType().getText());
 			lastProcessedClass.addMemberDescriptor(_fieldDecl);
 		}
-
-		super.visitProperty(_node);
 	}
 
 	@Override
 	public void visitMethod(MethodNode node) {
+		super.visitMethod(node);
+
 		MethodDescriptor _methodDesc = new MethodDescriptor();
 		_methodDesc.setName(node.getName());
 
@@ -212,8 +224,6 @@ public class GroovyClassCodeVisitor extends ClassCodeVisitorSupport {
 		lastProcessedClass.addMethodDescriptor(_methodDesc);
 
 		lastProcessedMethod = _methodDesc;
-
-		super.visitMethod(node);
 	}
 
 	private void resolveMethodCallExpression(MethodCallExpression _methodCallExpression) {
@@ -283,15 +293,16 @@ public class GroovyClassCodeVisitor extends ClassCodeVisitorSupport {
 		if (_node instanceof ClassNode) {
 			for (AnnotationNode _annotationNode : _node.getAnnotations()) {
 				ClassMetadata _classMetaData = new ClassMetadata();
-				_classMetaData.setName(_annotationNode.getClassNode().getName());
-
+				String _metadataKey = _annotationNode.getClassNode().getName();
+				_classMetaData.setName(_metadataKey);
+				
 				for (String _key : _annotationNode.getMembers().keySet()) {
 					Expression _expr = _annotationNode.getMember(_key);
 
 					_classMetaData.addValue(_key, _expr.toString());
 				}
 
-				lastProcessedClass.addMetadata(_classMetaData);
+				lastProcessedClass.addMetadata(_metadataKey, _classMetaData);
 			}
 		}
 	}
@@ -305,7 +316,10 @@ public class GroovyClassCodeVisitor extends ClassCodeVisitorSupport {
 		for (ImportNode _import : _imports) {
 			String _referencedType = _import.getClassName();
 			String _name = _import.getType().getNameWithoutPackage();
-			imports.put(_name, _referencedType);
+			if (_name.equals("*")) {
+				_name = _referencedType;
+			}
+			lastProcessedClass.addImport(_name, _referencedType);
 		}
 	}
 
