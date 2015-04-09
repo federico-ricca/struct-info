@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  ***************************************************************************/
-package org.structome.analysis.core;
+package org.structome.analysis.groovy;
 
 import java.util.Collection;
 import java.util.List;
@@ -36,6 +36,14 @@ import org.codehaus.groovy.ast.expr.Expression;
 import org.codehaus.groovy.ast.expr.MethodCallExpression;
 import org.codehaus.groovy.ast.expr.VariableExpression;
 import org.codehaus.groovy.control.SourceUnit;
+import org.structome.analysis.core.ClassDescriptor;
+import org.structome.analysis.core.ClassMetadata;
+import org.structome.analysis.core.DuplicateObjectException;
+import org.structome.analysis.core.MethodCallDescriptor;
+import org.structome.analysis.core.MethodDescriptor;
+import org.structome.analysis.core.ReceiverTypeProxy;
+import org.structome.analysis.core.StructureDatabase;
+import org.structome.analysis.core.VarDescriptor;
 
 public class GroovyClassCodeVisitor extends ClassCodeVisitorSupport {
 	private SourceUnit source;
@@ -43,11 +51,14 @@ public class GroovyClassCodeVisitor extends ClassCodeVisitorSupport {
 	private ClassDescriptor lastProcessedClass;
 	private MethodDescriptor lastProcessedMethod;
 
-	public GroovyClassCodeVisitor(SourceUnit _source, StructureDatabase<ClassDescriptor> _db) {
+	public void setSourceUnit(SourceUnit _source) {
 		source = _source;
+	}
+	
+	public void setDatabase(StructureDatabase<ClassDescriptor> _db) {
 		database = _db;
 	}
-
+	
 	@Override
 	protected SourceUnit getSourceUnit() {
 		return source;
@@ -321,6 +332,11 @@ public class GroovyClassCodeVisitor extends ClassCodeVisitorSupport {
 			}
 			lastProcessedClass.addImport(_name, _referencedType);
 		}
+	}
+
+	public void reset() {
+		lastProcessedClass = null;
+		lastProcessedMethod = null;
 	}
 
 }

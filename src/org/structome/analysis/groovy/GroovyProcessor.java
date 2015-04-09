@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  ***************************************************************************/
-package org.structome.analysis.core;
+package org.structome.analysis.groovy;
 
 import groovy.lang.GroovyClassLoader;
 
@@ -28,9 +28,17 @@ import org.codehaus.groovy.control.CompilationUnit;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.Phases;
 import org.codehaus.groovy.control.SourceUnit;
+import org.structome.analysis.core.ClassDescriptor;
+import org.structome.analysis.core.Processor;
+import org.structome.analysis.core.StructureDatabase;
 
 public class GroovyProcessor implements Processor<ClassDescriptor> {
 	private StructureDatabase<ClassDescriptor> database;
+	private GroovyClassCodeVisitor codeVisitor;
+
+	public GroovyProcessor(GroovyClassCodeVisitor _codeVisitor) {
+		codeVisitor = _codeVisitor;
+	}
 
 	@Override
 	public void visit(File _f) {
@@ -40,20 +48,21 @@ public class GroovyProcessor implements Processor<ClassDescriptor> {
 		GroovyClassLoader _loader = new GroovyClassLoader();
 		GroovyClassLoader _transformLoader = new GroovyClassLoader();
 
-		CompilationUnit _compilationUnit = new CompilationUnit(_configuration,
-				_security, _loader, _transformLoader);
+		CompilationUnit _compilationUnit = new CompilationUnit(_configuration, _security, _loader,
+				_transformLoader);
 		_compilationUnit.addSource(_f);
 
-		_compilationUnit.addPhaseOperation(
-				new CompilationUnit.PrimaryClassNodeOperation() {
-					@Override
-					public void call(final SourceUnit source,
-							GeneratorContext context, ClassNode classNode)
-							throws CompilationFailedException {
-						(new GroovyClassCodeVisitor(source, database))
-								.visitClass(classNode);
-					}
-				}, Phases.CONVERSION);
+		codeVisitor.reset();
+		codeVisitor.setDatabase(database);
+		
+		_compilationUnit.addPhaseOperation(new CompilationUnit.PrimaryClassNodeOperation() {
+			@Override
+			public void call(final SourceUnit source, GeneratorContext context, ClassNode classNode)
+					throws CompilationFailedException {
+				codeVisitor.setSourceUnit(source);
+				codeVisitor.visitClass(classNode);
+			}
+		}, Phases.CONVERSION);
 
 		_compilationUnit.compile(Phases.CONVERSION);
 	}

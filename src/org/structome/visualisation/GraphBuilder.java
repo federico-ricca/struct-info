@@ -21,9 +21,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.structome.analysis.core.GroovyJavaDatabase;
-import org.structome.analysis.core.GroovyJavaDatabaseReader;
-import org.structome.analysis.graph.GrailsClassDependencyGraphBuilder;
+import org.structome.analysis.groovy.GroovyJavaDatabase;
+import org.structome.analysis.groovy.GroovyJavaDatabaseReader;
+import org.structome.analysis.groovy.graph.GrailsClassDependencyGraphBuilder;
 
 public class GraphBuilder {
 	public static void main(String[] args) throws IOException {

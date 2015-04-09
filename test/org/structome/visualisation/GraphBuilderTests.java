@@ -28,9 +28,9 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.structome.analysis.core.GroovyJavaDatabase;
-import org.structome.analysis.core.GroovyJavaDatabaseReader;
-import org.structome.analysis.graph.GrailsClassDependencyGraphBuilder;
+import org.structome.analysis.groovy.GroovyJavaDatabase;
+import org.structome.analysis.groovy.GroovyJavaDatabaseReader;
+import org.structome.analysis.groovy.graph.GrailsClassDependencyGraphBuilder;
 
 public class GraphBuilderTests {
 	@ClassRule

@@ -13,8 +13,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  ***************************************************************************/
-package org.structome.analysis.core;
+package org.structome.analysis.groovy;
 
+import org.structome.analysis.core.ClassDescriptor;
+import org.structome.analysis.core.MethodCallDescriptor;
+import org.structome.analysis.core.MethodDescriptor;
+import org.structome.analysis.core.VarDescriptor;
 
 public interface GroovyJavaDatabaseVisitor {
 
@@ -27,5 +31,9 @@ public interface GroovyJavaDatabaseVisitor {
 	public void visitMethodVarDescriptor(VarDescriptor _methodVarDesc, GroovyJavaDatabase _db);
 
 	public void visitMethodCallDescriptor(MethodCallDescriptor _methodCallDesc, GroovyJavaDatabase _db);
+
+	public void visitEndOfMethodDescriptor(MethodDescriptor _methodDesc, GroovyJavaDatabase _db);
+
+	public void visitEndOfClassDescriptor(ClassDescriptor _classDesc, GroovyJavaDatabase _db);
 
 }

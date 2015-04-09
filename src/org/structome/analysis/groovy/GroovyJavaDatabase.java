@@ -13,8 +13,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  ***************************************************************************/
-package org.structome.analysis.core;
+package org.structome.analysis.groovy;
 
+import org.structome.analysis.core.ClassDescriptor;
+import org.structome.analysis.core.MethodCallDescriptor;
+import org.structome.analysis.core.MethodDescriptor;
+import org.structome.analysis.core.SimpleCollectionDatabase;
+import org.structome.analysis.core.VarDescriptor;
 
 public class GroovyJavaDatabase extends SimpleCollectionDatabase<ClassDescriptor> {
 
@@ -60,7 +65,10 @@ public class GroovyJavaDatabase extends SimpleCollectionDatabase<ClassDescriptor
 									+ _classDesc + "; " + _e.getMessage());
 						}
 
+						_visitor.visitEndOfMethodDescriptor(_methodDesc, this);
 					}
+
+					_visitor.visitEndOfClassDescriptor(_classDesc, this);
 				}
 			} catch (Exception _e) {
 				System.out.println("WARNING: could not process node " + _classDesc + "; " + _e.getMessage());

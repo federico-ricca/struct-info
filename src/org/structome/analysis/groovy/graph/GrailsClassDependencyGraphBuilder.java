@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  ***************************************************************************/
-package org.structome.analysis.graph;
+package org.structome.analysis.groovy.graph;
 
 import java.io.PrintStream;
 import java.util.Collection;
@@ -21,11 +21,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.structome.analysis.core.ClassDescriptor;
-import org.structome.analysis.core.GroovyJavaDatabase;
-import org.structome.analysis.core.GroovyJavaDatabaseVisitor;
 import org.structome.analysis.core.MethodCallDescriptor;
 import org.structome.analysis.core.MethodDescriptor;
 import org.structome.analysis.core.VarDescriptor;
+import org.structome.analysis.groovy.GroovyJavaDatabase;
+import org.structome.analysis.groovy.GroovyJavaDatabaseVisitor;
 
 public class GrailsClassDependencyGraphBuilder implements GroovyJavaDatabaseVisitor {
 	private Set<String> edgeSet = new HashSet<String>();
@@ -129,5 +129,17 @@ public class GrailsClassDependencyGraphBuilder implements GroovyJavaDatabaseVisi
 
 	public Collection<String> getEdges() {
 		return edgeSet;
+	}
+
+	@Override
+	public void visitEndOfMethodDescriptor(MethodDescriptor _methodDesc, GroovyJavaDatabase _db) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void visitEndOfClassDescriptor(ClassDescriptor _classDesc, GroovyJavaDatabase _db) {
+		// TODO Auto-generated method stub
+
 	}
 }

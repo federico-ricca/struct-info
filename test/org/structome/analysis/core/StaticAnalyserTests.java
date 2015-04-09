@@ -28,6 +28,8 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.structome.analysis.groovy.GroovyClassCodeVisitor;
+import org.structome.analysis.groovy.GroovyProcessor;
 import org.structome.util.FileCollector;
 
 public class StaticAnalyserTests {
@@ -82,7 +84,7 @@ public class StaticAnalyserTests {
 
 		StructureDatabase<ClassDescriptor> db = new SimpleCollectionDatabase<ClassDescriptor>();
 
-		Processor<ClassDescriptor> p = new GroovyProcessor();
+		Processor<ClassDescriptor> p = new GroovyProcessor(new GroovyClassCodeVisitor());
 
 		_staticAnalyser.addProcessor(".*\\.java", p);
 
@@ -103,7 +105,7 @@ public class StaticAnalyserTests {
 	public void analyseJavaGenericsExpression() throws Exception {
 		StructureDatabase<ClassDescriptor> db = new SimpleCollectionDatabase<ClassDescriptor>();
 
-		Processor<ClassDescriptor> p = new GroovyProcessor();
+		Processor<ClassDescriptor> p = new GroovyProcessor(new GroovyClassCodeVisitor());
 
 		p.setDatabase(db);
 
@@ -143,7 +145,7 @@ public class StaticAnalyserTests {
 	public void analysePackageDependency() throws Exception {
 		StructureDatabase<ClassDescriptor> db = new SimpleCollectionDatabase<ClassDescriptor>();
 
-		Processor<ClassDescriptor> p = new GroovyProcessor();
+		Processor<ClassDescriptor> p = new GroovyProcessor(new GroovyClassCodeVisitor());
 
 		p.setDatabase(db);
 
@@ -181,7 +183,7 @@ public class StaticAnalyserTests {
 	public void analyseParentClassDifferentPackage() throws Exception {
 		StructureDatabase<ClassDescriptor> db = new SimpleCollectionDatabase<ClassDescriptor>();
 
-		Processor<ClassDescriptor> p = new GroovyProcessor();
+		Processor<ClassDescriptor> p = new GroovyProcessor(new GroovyClassCodeVisitor());
 
 		p.setDatabase(db);
 
@@ -224,7 +226,7 @@ public class StaticAnalyserTests {
 	public void analyseParentClassSamePackage() throws Exception {
 		StructureDatabase<ClassDescriptor> db = new SimpleCollectionDatabase<ClassDescriptor>();
 
-		Processor<ClassDescriptor> p = new GroovyProcessor();
+		Processor<ClassDescriptor> p = new GroovyProcessor(new GroovyClassCodeVisitor());
 
 		p.setDatabase(db);
 
@@ -253,7 +255,7 @@ public class StaticAnalyserTests {
 	public void analyseParentClassThirdPartyPackage() throws Exception {
 		StructureDatabase<ClassDescriptor> db = new SimpleCollectionDatabase<ClassDescriptor>();
 
-		Processor<ClassDescriptor> p = new GroovyProcessor();
+		Processor<ClassDescriptor> p = new GroovyProcessor(new GroovyClassCodeVisitor());
 
 		p.setDatabase(db);
 

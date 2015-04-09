@@ -13,12 +13,19 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  ***************************************************************************/
-package org.structome.analysis.core;
+package org.structome.analysis.groovy;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+
+import org.structome.analysis.core.ClassDescriptor;
+import org.structome.analysis.core.DuplicateObjectException;
+import org.structome.analysis.core.MethodCallDescriptor;
+import org.structome.analysis.core.MethodDescriptor;
+import org.structome.analysis.core.ReceiverTypeProxy;
+import org.structome.analysis.core.VarDescriptor;
 
 public class GroovyJavaDatabaseReader {
 
