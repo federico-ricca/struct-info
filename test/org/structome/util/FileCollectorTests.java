@@ -15,9 +15,10 @@
  ***************************************************************************/
 package org.structome.util;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 
-import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -42,10 +43,16 @@ public class FileCollectorTests {
 		
 		folder.newFolder("SUBFOLDER-A");
 		folder.newFolder("SUBFOLDER-B");
-
+		folder.newFolder("SUBFOLDER-B/SUBSUB-B");
+		
 		_postfix=".groovy";
 		for (int index=0; index < MAX_FILES_GROOVY; index++) {
 			folder.newFile("SUBFOLDER-A/"+_preffix+index+_postfix);
+		}
+		
+		_postfix=".groovy";
+		for (int index=0; index < MAX_FILES_GROOVY; index++) {
+			folder.newFile("SUBFOLDER-B/SUBSUB-B/"+_preffix+index+_postfix);
 		}
 		
 		_postfix=".scala";
@@ -57,6 +64,7 @@ public class FileCollectorTests {
 	@Test
 	public void testCollectWithoutFilters() {
 		FileCollector _fileCollector = new FileCollector(folder.getRoot());
+		_fileCollector.excludeFolders(".*/SUBSUB-B");
 
 		assertTrue(_fileCollector.collect().size() == MAX_FILES_JAVA+MAX_FILES_GROOVY+MAX_FILES_SCALA);
 	}
@@ -64,9 +72,8 @@ public class FileCollectorTests {
 	@Test
 	public void testCollectTwiceWithoutFilters() {
 		FileCollector _fileCollector = new FileCollector(folder.getRoot());
+		_fileCollector.excludeFolders(".*/SUBSUB-B");
 
-		assertTrue(_fileCollector.collect().size() == MAX_FILES_JAVA+MAX_FILES_GROOVY+MAX_FILES_SCALA);
-		
 		assertTrue(_fileCollector.collect().size() == MAX_FILES_JAVA+MAX_FILES_GROOVY+MAX_FILES_SCALA);
 	}
 	
@@ -74,7 +81,7 @@ public class FileCollectorTests {
 	public void testCollectionWithExcludeFolderFilters() {
 		FileCollector _fileCollector = new FileCollector(folder.getRoot());
 
-		_fileCollector.excludeFolders("SUBFOLDER-A");
+		_fileCollector.excludeFolders("(SUBFOLDER-A|.*/SUBSUB-B)");
 		
 		assertTrue(_fileCollector.collect().size() == MAX_FILES_JAVA+MAX_FILES_GROOVY);		
 	}
@@ -84,6 +91,7 @@ public class FileCollectorTests {
 		FileCollector _fileCollector = new FileCollector(folder.getRoot());
 
 		_fileCollector.resetExcludeFolders();
+		_fileCollector.excludeFolders(".*/SUBSUB-B");
 
 		assertTrue(_fileCollector.collect(".*\\.(java|groovy)").size() == MAX_FILES_JAVA+MAX_FILES_GROOVY);		
 	}

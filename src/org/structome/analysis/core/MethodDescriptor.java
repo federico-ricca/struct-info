@@ -20,12 +20,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 public class MethodDescriptor {
 	private ClassDescriptor parentClass;
 	private String name;
-	private List<MethodCallDescriptor> methodCalls = new ArrayList<MethodCallDescriptor>();
-	private Map<String, VarDescriptor> declaredVariables = new HashMap<String, VarDescriptor>();
+	private List<MethodCallDescriptor> methodCalls;
+	private Map<String, VarDescriptor> declaredVariables;
+
+	public MethodDescriptor() {
+		methodCalls = new ArrayList<MethodCallDescriptor>();
+		declaredVariables = new HashMap<String, VarDescriptor>();
+	}
 
 	public void addVarDescriptor(VarDescriptor _varDesc) {
 		_varDesc.setParentMethod(this);
@@ -35,8 +41,9 @@ public class MethodDescriptor {
 
 	public void setParentClass(ClassDescriptor _parentClass) {
 		parentClass = _parentClass;
-		
-		// retrigger setParentClass on local vars (in case of deferred addition of this method to parent class)
+
+		// retrigger setParentClass on local vars (in case of deferred addition
+		// of this method to parent class)
 		for (VarDescriptor _varDesc : declaredVariables.values()) {
 			_varDesc.setParentClass(parentClass);
 		}

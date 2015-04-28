@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,21 @@ import org.structome.analysis.groovy.GroovyProcessor;
 import org.structome.util.FileCollector;
 
 public class StaticAnalyserTests {
+	static String[] sourceCode = { 
+		"package some.package;",
+		"import some.other.package.BaseClass;",
+		"class TestClassA extends BaseClass {", 
+		"	public List<ClassB> myList;",
+		"	public void testMethod(Set<ClassC> _set) {", 
+		"		Map<ClassD, ClassE> _map = [:];",
+		"		SomeClass.someStaticMethod(0);",
+		"		if (_set instanceof AnotherClass) {",
+		"			BaseClass p = (AnotherClass) _set;",
+		"		}",
+		"	}", 
+		"}" 
+		};
+	
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
 
@@ -278,5 +294,64 @@ public class StaticAnalyserTests {
 		assertNotNull(_classDesc);
 		assertNotNull(_classDesc.getSuperClass());
 		assertEquals("some.third.party.ClassFromA3rdPartyPackage", _classDesc.getSuperClass().getName());
+	}
+	
+	@Test
+	public void detectTypes() throws Exception {
+		folder.create();
+		File _f = folder.newFile();
+
+		PrintStream _ps = new PrintStream(_f);
+
+		for (String s : sourceCode) {
+			_ps.println(s);
+		}
+
+		_ps.close();
+
+		StructureDatabase<ClassDescriptor> db = new SimpleCollectionDatabase<ClassDescriptor>();
+
+		Processor<ClassDescriptor> p = new GroovyProcessor(new GroovyClassCodeVisitor());
+
+		p.setDatabase(db);
+
+		p.visit(_f);
+		/*
+		"package some.package;",
+		"import some.other.package.BaseClass;",
+		"class TestClassA extends BaseClass {", 
+		"	public List<ClassB> myList;",
+		"	public void testMethod(Set<ClassC> _set) {", 
+		"		Map<ClassD, ClassE> _map = [:];",
+		"		SomeClass.someStaticMethod(0);",
+		"		if (_set instanceof AnotherClass) {",
+		"			BaseClass p = (AnotherClass) _set;",
+		"		}",
+		"	}", 
+		"}" 
+
+		 */
+		
+		ClassDescriptor _classDescriptor = db.get("some.package.TestClassA");
+		assertNotNull (_classDescriptor);
+		assertEquals(1, _classDescriptor.getImports().size());
+		assertEquals("some.other.package.BaseClass", _classDescriptor.getImport("BaseClass"));
+		VarDescriptor _varDescriptor = _classDescriptor.getMember("myList");
+		assertNotNull(_varDescriptor);
+		assertEquals("List", _varDescriptor.getType());
+		assertEquals("ClassB", _varDescriptor.getGenerics().elementAt(0));
+		assertEquals(1, _classDescriptor.getAllMethods().size());
+		MethodDescriptor[] _methods = new MethodDescriptor[1];
+		_classDescriptor.getAllMethods().toArray(_methods);
+		MethodDescriptor _methodDescriptor = _methods[0];
+		assertEquals("testMethod", _methodDescriptor.getName());
+		assertEquals(2, _methodDescriptor.getAllVarDescriptors().size());
+		_varDescriptor = _methodDescriptor.getVarDescriptor("_set");
+		assertEquals("Set", _varDescriptor.getType());
+		assertEquals(1, _varDescriptor.getGenerics().size());
+		assertEquals("ClassC", _varDescriptor.getGenerics().elementAt(0));
+		_varDescriptor = _methodDescriptor.getVarDescriptor("_map");
+		assertEquals("Map", _varDescriptor.getType());
+		
 	}
 }

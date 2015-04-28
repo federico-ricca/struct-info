@@ -40,7 +40,8 @@ public class FileCollector {
 			if (!f.isDirectory()) {
 				_collected.add(f);
 			} else {
-                if (folderExclusionFilter == null || !f.getName().matches(folderExclusionFilter)) {
+				String _folder = f.getAbsolutePath().substring(root.getAbsolutePath().length()+1);
+                if (folderExclusionFilter == null || !_folder.matches(folderExclusionFilter)) {
 					this.beginCollect(_collected, f, _regex);
 				}
 			}
