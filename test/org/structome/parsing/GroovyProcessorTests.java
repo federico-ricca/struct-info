@@ -56,7 +56,7 @@ public class GroovyProcessorTests {
 			}
 		});
 
-		// Create and set a code visitor for collecting class names
+		// Create and set a code visitor for collecting main class name and superclass
 		_groovyProcessor.setCodeVisitor(new GroovyProcessorCodeVisitor<Set<String>>() {
 
 			@Override
@@ -66,7 +66,6 @@ public class GroovyProcessorTests {
 				Set<String> _prod = this.getProduct();
 				
 				_prod.add(node.getNameWithoutPackage());
-				
 				_prod.add(node.getSuperClass().getNameWithoutPackage());
 			}
 
